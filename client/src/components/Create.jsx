@@ -6,11 +6,13 @@ const Create = (props) => {
 
     const navigate = useNavigate();
 
-    const [name, setName] = useState("")
+    const [name, setName] = useState("");
+
+    const [errors, setErrors] = useState([]);
 
     const createAuthor = (e) => {
         e.preventDefault()
-        
+
         const newAuthor = {
             name
         }
@@ -25,7 +27,16 @@ const Create = (props) => {
             })
             .catch(err => {
                 console.log("Client error");
-                console.log(err);
+                console.log(err.response.data.errors);
+                
+                    // Validations 
+                    const errorResponse = err.response.data.errors; // Get the errors from err.response.data
+                    const errorArr = []; // Define a temp error array to push the messages in
+                    for (const key of Object.keys(errorResponse)) { // Loop through all errors and get the messages
+                        errorArr.push(errorResponse[key].message)
+                    }
+                    // Set Errors
+                    setErrors(errorArr);
             })
 
     }
@@ -33,12 +44,13 @@ const Create = (props) => {
 
     return (
         <div>
-            <p>{JSON.stringify(name)}</p>
+            {/* <p>{JSON.stringify(name)}</p> */}
             <h4>Add new author:</h4>
             <form onSubmit={createAuthor}>
-                Name: <input onChange={(e) => setName(e.target.value)} value={name}/>
+                {errors.map((err, index) => <p style={{color: "red"}} key={index}>{err}</p>)}
+                Name: <input onChange={(e) => setName(e.target.value)} value={name} />
                 <br />
-                <button><Link to={"/"}>Cancel</Link></button>
+                <Link to={"/"}><button>Cancel</button></Link>
                 <button>Submit</button>
             </form>
         </div>
